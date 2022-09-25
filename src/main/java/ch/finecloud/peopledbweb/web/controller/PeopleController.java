@@ -3,6 +3,7 @@ package ch.finecloud.peopledbweb.web.controller;
 import ch.finecloud.peopledbweb.biz.model.Person;
 import ch.finecloud.peopledbweb.data.PersonRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,5 +52,15 @@ public class PeopleController {
             personRepository.deleteAllById(selections.get());
         }
         return "redirect:people";
+    }
+
+    @PostMapping(params = "edit=true")
+    public String editPeople(@RequestParam Optional<List<Long>> selections, Model model) {
+        System.out.println(selections);
+        if (selections.isPresent()) {
+            Optional<Person> person = personRepository.findById(selections.get().get(0));
+            model.addAttribute("person", person);
+        }
+        return "people";
     }
 }
