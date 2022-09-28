@@ -1,6 +1,7 @@
 package ch.finecloud.peopledbweb.web.controller;
 
 import ch.finecloud.peopledbweb.biz.model.Person;
+import ch.finecloud.peopledbweb.biz.service.PersonService;
 import ch.finecloud.peopledbweb.data.FileStorageRepository;
 import ch.finecloud.peopledbweb.data.PersonRepository;
 import ch.finecloud.peopledbweb.exception.StorageException;
@@ -29,10 +30,12 @@ public class PeopleController {
             """;
     private PersonRepository personRepository;
     private FileStorageRepository fileStorageRepository;
+    private PersonService personService;
 
-    public PeopleController(PersonRepository personRepository, FileStorageRepository fileStorageRepository) {
+    public PeopleController(PersonRepository personRepository, FileStorageRepository fileStorageRepository, PersonService personService) {
         this.personRepository = personRepository;
         this.fileStorageRepository = fileStorageRepository;
+        this.personService = personService;
     }
 
     @ModelAttribute("people")
@@ -65,8 +68,7 @@ public class PeopleController {
         log.info("Errors: " + errors);
         if (!errors.hasErrors()) {
             try {
-                fileStorageRepository.save(photoFile.getOriginalFilename(), photoFile.getInputStream());
-                personRepository.save(person);
+                personService.save(person, photoFile.getInputStream());
                 return "redirect:people";
             } catch (StorageException e) {
                 model.addAttribute("errorMsg", "System is currently unable to accept photo files at this time.");
@@ -80,7 +82,8 @@ public class PeopleController {
     public String deletePeople(@RequestParam Optional<List<Long>> selections) {
         log.info(selections);
         if (selections.isPresent()) {
-            personRepository.deleteAllById(selections.get());
+//            personRepository.deleteAllById(selections.get());
+            personService.deleteAllById(selections.get());
         }
         return "redirect:people";
     }
