@@ -3,15 +3,15 @@ package ch.finecloud.peopledbweb.biz.service;
 import ch.finecloud.peopledbweb.biz.model.Person;
 import ch.finecloud.peopledbweb.data.FileStorageRepository;
 import ch.finecloud.peopledbweb.data.PersonRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+
 
 @Service
 public class PersonService {
@@ -38,12 +38,17 @@ public class PersonService {
         return personRepository.findAll();
     }
 
+    public Page<Person> findAll(Pageable pageable) {
+        return personRepository.findAll(pageable);
+    }
+
     public void deleteAllById(Iterable<Long> ids) {
-        Iterable<Person> peopleToDelete = personRepository.findAllById(ids);
-        Stream<Person> peopleStream = StreamSupport.stream(peopleToDelete.spliterator(), false);
-        Set<String> filenames = peopleStream
-                .map(Person::getPhotoFilename)
-                .collect(Collectors.toSet());
+//        Iterable<Person> peopleToDelete = personRepository.findAllById(ids);
+//        Stream<Person> peopleStream = StreamSupport.stream(peopleToDelete.spliterator(), false);
+//        Set<String> filenames = peopleStream
+//                .map(Person::getPhotoFilename)
+//                .collect(Collectors.toSet());
+        Set<String> filenames = personRepository.findFilenamesByIds(ids);
         personRepository.deleteAllById(ids);
         storageRepository.deleteAllByName(filenames);
     }
