@@ -42,7 +42,7 @@ public class PeopleController {
     }
 
     @ModelAttribute("people")
-    public Page<Person> getPeople(@PageableDefault(size = 3) Pageable page) {
+    public Page<Person> getPeople(@PageableDefault(size = 10) Pageable page) {
         return personService.findAll(page);
     }
 
@@ -81,7 +81,7 @@ public class PeopleController {
         return "people";
     }
 
-    @PostMapping(params = "delete=true")
+    @PostMapping(params = "action=delete")
     public String deletePeople(@RequestParam Optional<List<Long>> selections) {
         log.info(selections);
         if (selections.isPresent()) {
@@ -91,7 +91,7 @@ public class PeopleController {
         return "redirect:people";
     }
 
-    @PostMapping(params = "edit=true")
+    @PostMapping(params = "action=edit")
     public String editPeople(@RequestParam Optional<List<Long>> selections, Model model) {
         log.info(selections);
         if (selections.isPresent()) {
@@ -99,5 +99,17 @@ public class PeopleController {
             model.addAttribute("person", person);
         }
         return "people";
+    }
+
+    @PostMapping(params = "action=import")
+    public String importCSV(@RequestParam MultipartFile csvFile) {
+        log.info("Filename: " + csvFile.getOriginalFilename());
+        log.info("File size: " + csvFile.getSize());
+        try {
+            personService.importCSV(csvFile.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return "redirect:people";
     }
 }
