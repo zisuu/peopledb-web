@@ -1,6 +1,5 @@
 FROM gradle:6.9.3-jdk17 as builder
 COPY . /usr/src/java-code/
-COPY .env /usr/src/java-code/
 WORKDIR /usr/src/java-code
 RUN gradle bootJar -i --stacktrace
 
