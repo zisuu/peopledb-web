@@ -6,5 +6,5 @@ FROM openjdk:17-slim
 EXPOSE 8080
 USER root
 WORKDIR build/libs
-#COPY --from=builder /usr/src/java-code/build/libs/*.jar ./app.jar
+COPY ./build/libs/*.jar ./build/libs/
 ENTRYPOINT ["java", "-jar", "peopledb-web-0.0.1-SNAPSHOT.jar"]
